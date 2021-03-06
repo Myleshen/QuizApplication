@@ -35,7 +35,7 @@ public class QuestionAnswerController {
     @PostMapping("save")
     public String save(@RequestBody QuestionModel questionModel) {
         System.out.println(questionModel.toString());
-        List<AnswerModel> answerModelList = questionModel.getAnswerModelList();
+        List<AnswerModel> answerModelList = questionModel.getAnswerList();
         answerModelList.forEach(questionAnswerService::SaveAnswer);
         return questionAnswerService.SaveQuestion(questionModel);
     }

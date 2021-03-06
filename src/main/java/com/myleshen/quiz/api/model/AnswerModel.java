@@ -24,7 +24,7 @@ public class AnswerModel {
     private Boolean isCorrectAnswer;
 
     @ManyToOne
-    private QuestionModel questionModel;
+    private QuestionModel question;
 
 
 }

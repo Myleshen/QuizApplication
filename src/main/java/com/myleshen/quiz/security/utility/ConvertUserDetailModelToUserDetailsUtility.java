@@ -24,11 +24,10 @@ public class ConvertUserDetailModelToUserDetailsUtility implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<Role> roles = user.getRoles();
         List<SimpleGrantedAuthority> grantedAuthorityList = new ArrayList<>();
-
-        for (Role role : roles) {
-            grantedAuthorityList.add(new SimpleGrantedAuthority(role.getRoleName()));
+        String[] rolesList = user.getRoles().split(",");
+        for (String role: rolesList) {
+            grantedAuthorityList.add(new SimpleGrantedAuthority(role));
         }
         return grantedAuthorityList;
     }
@@ -45,17 +44,17 @@ public class ConvertUserDetailModelToUserDetailsUtility implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return user.getIsExpired();
+        return user.getIsNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getIsAccountLocked();
+        return user.getIsAccountNonLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return user.getIsCredentialsExpired();
+        return user.getIsCredentialsNonExpired();
     }
 
     @Override

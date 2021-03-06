@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,14 +21,17 @@ public class SecurityController {
 
 
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final UserDetailService userDetailService;
     private final JwtUtility jwtUtility;
 
     @Autowired
     public SecurityController(AuthenticationManager authenticationManager,
+                              BCryptPasswordEncoder passwordEncoder,
                               UserDetailService userDetailService,
                               JwtUtility jwtUtility) {
         this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
         this.userDetailService = userDetailService;
         this.jwtUtility = jwtUtility;
     }
@@ -54,6 +58,13 @@ public class SecurityController {
 
     @PostMapping("/signup")
     public String saveUser(@RequestBody UserDetailsModel userDetails){
-        return "Success";
+        userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        userDetails.setIsActive(true);
+        userDetails.setIsNonExpired(true);
+        userDetails.setIsCredentialsNonExpired(true);
+        userDetails.setIsAccountNonLocked(true);
+        userDetails.setRoles("USER");
+        System.out.println(userDetails.toString());
+        return userDetailService.createUser(userDetails);
     }
 }

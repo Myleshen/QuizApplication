@@ -1,5 +1,6 @@
 package com.myleshen.quiz.api.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class QuestionModel {
     private Integer correctAnswer;
 
     @OneToMany
-    private List<AnswerModel> answerModelList;
+    @JsonAlias(value = "answerList")
+    private List<AnswerModel> answerList;
 
 }

@@ -29,7 +29,6 @@ public class QuestionAnswerService {
     }
 
     public String SaveAnswer(AnswerModel answerModel){
-        answerModel.setQuestionModel(answerModel.getQuestionModel());
         answersRepository.save(answerModel);
         return "Success";
     }
