@@ -4,11 +4,11 @@ import com.myleshen.quiz.security.model.UserDetailsModel;
 import com.myleshen.quiz.security.repository.UserRepository;
 import com.myleshen.quiz.security.utility.ConvertUserDetailModelToUserDetailsUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -35,9 +35,13 @@ public class UserDetailService implements UserDetailsService {
         throw new UsernameNotFoundException("Recheck The Details");
     }
 
-    public String createUser(UserDetailsModel user){
-        userRepository.save(user);
-        return "Success";
+    public ResponseEntity<?> createUser(UserDetailsModel user){
+        try {
+            userRepository.save(user);
+        } catch (Exception error) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

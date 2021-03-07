@@ -2,12 +2,16 @@ package com.myleshen.quiz.api.service;
 
 
 import com.myleshen.quiz.api.model.AnswerModel;
+import com.myleshen.quiz.api.model.MaskedQuestionModel;
 import com.myleshen.quiz.api.model.QuestionModel;
 import com.myleshen.quiz.api.repository.AnswersRepository;
 import com.myleshen.quiz.api.repository.QuestionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,22 +27,37 @@ public class QuestionAnswerService {
         this.answersRepository = answersRepository;
     }
 
-    public String SaveQuestion(QuestionModel questionModel){
+    public ResponseEntity<?> saveQuestion(QuestionModel questionModel){
         questionsRepository.save(questionModel);
-        return "Success";
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    public String SaveAnswer(AnswerModel answerModel){
+    public void  saveAnswer(AnswerModel answerModel){
         answersRepository.save(answerModel);
-        return "Success";
     }
 
-    public List<QuestionModel> GetQuestions() {
+    public List<QuestionModel> getQuestions(){
         return questionsRepository.findAll();
     }
 
-    public Optional<QuestionModel> GetQuestionById(Integer id){
+    public List<MaskedQuestionModel> getMaskedQuestions() {
+        List<QuestionModel> questions = questionsRepository.findAll();
+        List<MaskedQuestionModel> maskedQuestions = new ArrayList<>();
+        for (QuestionModel question : questions) {
+            maskedQuestions.add(new MaskedQuestionModel(question));
+        }
+        return maskedQuestions;
+    }
+
+    public Optional<QuestionModel> getQuestionById(Integer id){
         return questionsRepository.findById(id);
+    }
+
+    public Boolean validateAnswerForQuestion(Integer questionId, Integer answerNumber) {
+        QuestionModel question =
+                questionsRepository.findById(questionId).orElse(null);
+        Integer correctAnswer = question != null ? question.getCorrectAnswer() : -1;
+        return answerNumber.equals(correctAnswer);
     }
 
 }

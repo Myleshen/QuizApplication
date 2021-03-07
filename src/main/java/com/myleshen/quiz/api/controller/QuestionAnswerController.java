@@ -2,9 +2,11 @@ package com.myleshen.quiz.api.controller;
 
 
 import com.myleshen.quiz.api.model.AnswerModel;
+import com.myleshen.quiz.api.model.MaskedQuestionModel;
 import com.myleshen.quiz.api.model.QuestionModel;
 import com.myleshen.quiz.api.service.QuestionAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,22 +34,31 @@ public class QuestionAnswerController {
         return "Index";
     }
 
-    @PostMapping("save")
-    public String save(@RequestBody QuestionModel questionModel) {
-        System.out.println(questionModel.toString());
+    @PostMapping("save/question")
+    public ResponseEntity<?> saveQuestion(@RequestBody QuestionModel questionModel) {
         List<AnswerModel> answerModelList = questionModel.getAnswerList();
-        answerModelList.forEach(questionAnswerService::SaveAnswer);
-        return questionAnswerService.SaveQuestion(questionModel);
+        answerModelList.forEach(questionAnswerService::saveAnswer);
+        return questionAnswerService.saveQuestion(questionModel);
     }
 
-    @GetMapping("getquestions")
+    @GetMapping("get/questions/masked")
+    public List<MaskedQuestionModel> getMaskedQuestions() {
+        return questionAnswerService.getMaskedQuestions();
+    }
+
+    @GetMapping("get/questions/nonmasked")
     public List<QuestionModel> getQuestions() {
-        return questionAnswerService.GetQuestions();
+        return questionAnswerService.getQuestions();
     }
 
-    @GetMapping("getquestion/{id}")
+    @GetMapping("get/question/{id}")
     public QuestionModel getQuestionById(@PathVariable Integer id){
-        return questionAnswerService.GetQuestionById(id).orElse(new QuestionModel());
+        return questionAnswerService.getQuestionById(id).orElse(new QuestionModel());
+    }
+
+    @PostMapping("validate")
+    public Boolean validateAnswer(@RequestBody Integer questionId, Integer answerNumber){
+        return questionAnswerService.validateAnswerForQuestion(questionId, answerNumber);
     }
 
 }

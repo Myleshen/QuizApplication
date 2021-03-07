@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 public class SecurityController {
 
@@ -52,19 +54,30 @@ public class SecurityController {
                 .loadUserByUsername(authenticationRequestModel.getUserName());
 
         final String jwt = jwtUtility.generateToken(userDetails);
+        Date jwtExpirationDate = jwtUtility.extractExpiration(jwt);
 
-        return ResponseEntity.ok(new AuthenticationResponseModel(jwt));
+        return ResponseEntity.ok(new AuthenticationResponseModel(jwt, jwtExpirationDate));
     }
 
     @PostMapping("/signup")
-    public String saveUser(@RequestBody UserDetailsModel userDetails){
+    public ResponseEntity<?> saveUser(@RequestBody UserDetailsModel userDetails){
         userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         userDetails.setIsActive(true);
         userDetails.setIsNonExpired(true);
         userDetails.setIsCredentialsNonExpired(true);
         userDetails.setIsAccountNonLocked(true);
         userDetails.setRoles("USER");
-        System.out.println(userDetails.toString());
+        return userDetailService.createUser(userDetails);
+    }
+
+    @PostMapping("/signup/admin")
+    public ResponseEntity<?> saveAdminUser(@RequestBody UserDetailsModel userDetails) {
+        userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        userDetails.setIsActive(true);
+        userDetails.setIsNonExpired(true);
+        userDetails.setIsCredentialsNonExpired(true);
+        userDetails.setIsAccountNonLocked(true);
+        userDetails.setRoles("USER, ADMIN");
         return userDetailService.createUser(userDetails);
     }
 }
